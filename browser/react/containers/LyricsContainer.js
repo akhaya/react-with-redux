@@ -11,7 +11,7 @@ export default class LyricsContainer extends Component {
     this.state = Object.assign({
         artistQuery: '',
         songQuery: ''
-      }, store.getState().lyrics)
+      }, store.getState())
     this.setArtist = this.setArtist.bind(this);
     this.setSong = this.setSong.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -19,7 +19,7 @@ export default class LyricsContainer extends Component {
 
   componentDidMount(){
     this.unsubscribe = store.subscribe(() => {
-        this.setState(store.getState().lyrics)
+        this.setState(store.getState())
     });
   }
 
@@ -47,7 +47,7 @@ export default class LyricsContainer extends Component {
   render(){
     return (
       <Lyrics
-          text={this.state.text}
+          text={this.state.lyrics.text}
           setArtist={this.setArtist}
           setSong={this.setSong}
           artistQuery={this.state.artistQuery}
