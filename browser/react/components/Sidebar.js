@@ -34,7 +34,7 @@ const Sidebar = (props) => {
       </section>
       <hr />
       <ul className="list-unstyled">
-        {
+        {playlists &&
           playlists.map(playlist => {
             return (
             <li key={playlist.id} className="playlist-item menu-item">

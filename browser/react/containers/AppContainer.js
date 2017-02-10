@@ -12,6 +12,7 @@ import Player from '../components/Player';
 
 import store from '../store';
 import {play, pause, setSong, setList, setProgress} from '../action-creators/player';
+import {receiveAlbum, fetchAlbums, fetchAlbum} from '../action-creators/albums';
 
 import { convertAlbum, convertAlbums, convertSong, skip } from '../utils';
 
@@ -25,7 +26,6 @@ export default class AppContainer extends Component {
     this.toggleOne = this.toggleOne.bind(this);
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
-    this.selectAlbum = this.selectAlbum.bind(this);
     this.selectArtist = this.selectArtist.bind(this);
     this.addPlaylist = this.addPlaylist.bind(this);
     this.selectPlaylist = this.selectPlaylist.bind(this);
@@ -37,13 +37,14 @@ export default class AppContainer extends Component {
 
     Promise
       .all([
-        axios.get('/api/albums/'),
         axios.get('/api/artists/'),
         axios.get('/api/playlists')
       ])
       .then(res => res.map(r => r.data))
       .then(data => this.onLoad(...data));
 
+    store.dispatch(fetchAlbums());
+    
     AUDIO.addEventListener('ended', () =>
       this.next());
 
@@ -61,7 +62,6 @@ export default class AppContainer extends Component {
 
   onLoad (albums, artists, playlists) {
     this.setState({
-      albums: convertAlbums(albums),
       artists: artists,
       playlists: playlists
     });
@@ -107,14 +107,6 @@ export default class AppContainer extends Component {
 
   prev () {
     this.startSong(...skip(-1, this.state.player));
-  }
-
-  selectAlbum (albumId) {
-    axios.get(`/api/albums/${albumId}`)
-      .then(res => res.data)
-      .then(album => this.setState({
-        selectedAlbum: convertAlbum(album)
-      }));
   }
 
   selectArtist (artistId) {
@@ -194,7 +186,6 @@ export default class AppContainer extends Component {
     const props = Object.assign({}, this.state, {
       toggleOne: this.toggleOne,
       toggle: this.toggle,
-      selectAlbum: this.selectAlbum,
       selectArtist: this.selectArtist,
       addPlaylist: this.addPlaylist,
       selectPlaylist: this.selectPlaylist,
@@ -202,7 +193,7 @@ export default class AppContainer extends Component {
       addSongToPlaylist: this.addSongToPlaylist
     });
 
-    console.log(this.state.player.progress)
+    console.log('this.state: ', this.state)
 
     return (
       <div id="main" className="container-fluid">
