@@ -1,22 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { fetchArtist } from '../action-creators/artists';
+import store from '../store';
 
 class Artist extends React.Component {
 
   componentDidMount () {
     const artistId = this.props.routeParams.artistId;
-    const selectArtist = this.props.selectArtist;
 
-    selectArtist(artistId);
+    store.dispatch(fetchArtist(artistId));
   }
 
   render () {
-
-    const artist = this.props.selectedArtist;
+    const artist = this.props.artists? this.props.artists.selectedArtist : {} //what
     const albums = artist.albums || [];
     const songs = artist.songs || [];
     const children = this.props.children;
-
+    console.log("Re-rendering with", artist, albums, songs)
     return (
       <div>
         <h3>{ artist.name }</h3>
@@ -26,7 +26,7 @@ class Artist extends React.Component {
         </ul>
         {
           children && React.cloneElement(children, Object.assign({}, this.props, {
-            albums: albums,
+            allAlbums: albums,
             songs: songs
           }))
         }

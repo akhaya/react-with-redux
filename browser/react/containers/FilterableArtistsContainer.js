@@ -22,7 +22,7 @@ class FilterableArtistsContainer extends React.Component {
   render () {
 
     const inputValue = this.state.inputValue;
-    const filteredArtists = this.props.artists.filter(artist =>
+    const filteredArtists = this.props.artists.artists.filter(artist =>
       artist.name.match(inputValue));
 
     return (

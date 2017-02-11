@@ -13,7 +13,7 @@ import Player from '../components/Player';
 import store from '../store';
 import {play, pause, setSong, setList, setProgress} from '../action-creators/player';
 import {receiveAlbum, fetchAlbums, fetchAlbum} from '../action-creators/albums';
-
+import {fetchArtists} from '../action-creators/artists';
 import { convertAlbum, convertAlbums, convertSong, skip } from '../utils';
 
 export default class AppContainer extends Component {
@@ -26,7 +26,6 @@ export default class AppContainer extends Component {
     this.toggleOne = this.toggleOne.bind(this);
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
-    this.selectArtist = this.selectArtist.bind(this);
     this.addPlaylist = this.addPlaylist.bind(this);
     this.selectPlaylist = this.selectPlaylist.bind(this);
     this.loadSongs = this.loadSongs.bind(this);
@@ -37,14 +36,14 @@ export default class AppContainer extends Component {
 
     Promise
       .all([
-        axios.get('/api/artists/'),
         axios.get('/api/playlists')
       ])
       .then(res => res.map(r => r.data))
       .then(data => this.onLoad(...data));
 
     store.dispatch(fetchAlbums());
-    
+    store.dispatch(fetchArtists())
+
     AUDIO.addEventListener('ended', () =>
       this.next());
 
@@ -109,25 +108,27 @@ export default class AppContainer extends Component {
     this.startSong(...skip(-1, this.state.player));
   }
 
-  selectArtist (artistId) {
-    Promise
-      .all([
-        axios.get(`/api/artists/${artistId}`),
-        axios.get(`/api/artists/${artistId}/albums`),
-        axios.get(`/api/artists/${artistId}/songs`)
-      ])
-      .then(res => res.map(r => r.data))
-      .then(data => this.onLoadArtist(...data));
-  }
+  // selectArtist (artistId) {
 
-  onLoadArtist (artist, albums, songs) {
-    songs = songs.map(convertSong);
-    albums = convertAlbums(albums);
-    artist.albums = albums;
-    artist.songs = songs;
 
-    this.setState({ selectedArtist: artist });
-  }
+  //   Promise
+  //     .all([
+  //       axios.get(`/api/artists/${artistId}`),
+  //       axios.get(`/api/artists/${artistId}/albums`),
+  //       axios.get(`/api/artists/${artistId}/songs`)
+  //     ])
+  //     .then(res => res.map(r => r.data))
+  //     .then(data => this.onLoadArtist(...data));
+  // }
+
+  // onLoadArtist (artist, albums, songs) {
+  //   songs = songs.map(convertSong);
+  //   albums = convertAlbums(albums);
+  //   artist.albums = albums;
+  //   artist.songs = songs;
+
+  //   this.setState({ selectedArtist: artist });
+  // }
 
   addPlaylist (playlistName) {
     axios.post('/api/playlists', { name: playlistName })
@@ -184,9 +185,9 @@ export default class AppContainer extends Component {
   render () {
 
     const props = Object.assign({}, this.state, {
+      allAlbums: this.state.albums.albums,
       toggleOne: this.toggleOne,
       toggle: this.toggle,
-      selectArtist: this.selectArtist,
       addPlaylist: this.addPlaylist,
       selectPlaylist: this.selectPlaylist,
       loadSongs: this.loadSongs,
